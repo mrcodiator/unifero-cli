@@ -1,7 +1,7 @@
 # unifero-cli
 
 <p align="center">
-  <img src="./public/unifero.png" alt="unifero logo" width="220" />
+  <img src="./assets/logo.svg" alt="unifero logo" width="220" />
 </p>
 
 Unifero-CLI is a compact Python toolkit that brings web-search and documentation crawling into a single, easy to use tool. It focuses on safely extracting technical content and code snippets from result pages or documentation sites. The project provides:
@@ -148,6 +148,38 @@ Notes on output fields:
 - `results`: list of pages (search results or crawled docs pages).
 - Each result includes `url`, `title`, `snippet` (search mode), and `content` when `include_content` is true. `content` is a Markdown-ready string with fenced code blocks for extracted code.
 - `fetched`: (docs mode) boolean indicating whether the page content was successfully fetched and parsed. If false, the `error` field may provide a short message.
+
+### Additional fields & wrapper metadata
+
+You may also see several additional fields in the CLI/API outputs and test artifacts (for example in `output.txt`). These are emitted by the runner/test harness and the core tool to help clients and debugging tools interpret results:
+
+- `favicon` (per-result): URL to the site's favicon, when available. Useful for UI lists where a compact site icon is shown.
+- `og_image` (per-result): URL of the Open Graph image (og:image) if discovered in the page metadata.
+- `base_url` (top-level for `docs`): the exact base URL you requested for docs mode. The tool ensures the requested base URL appears in results even if the crawler doesn't discover it.
+- `status_code` (wrapper): the HTTP-like status code returned by the wrapper (e.g., 200 for success, 400 for invalid input). This is not the target site's HTTP code but the wrapper's response code.
+- `name` and `request` (wrapper): the test-runner or wrapper may produce a `name` label for the run and echo the `request` payload so you can trace which input produced the output.
+- `response` (wrapper): when present, this contains the same structured object that the CLI/API returns (the `results` array, etc.).
+- `elapsed` (wrapper): number of seconds the operation took. Useful for performance logging.
+- `attempts` (wrapper): how many network/operation attempts were made (useful if retries occured).
+
+Example (truncated from a test runner):
+
+```json
+{
+  "name": "search_minimal",
+  "request": {"mode":"search","query":"Next.js routing"},
+  "status_code": 200,
+  "response": { "query":"Next.js routing", "results": [ ... ] },
+  "elapsed": 1.58,
+  "attempts": 1
+}
+```
+
+How to interpret these fields:
+
+- The `response` object is the canonical output your client should consume. Wrapper-level metadata (`name`, `status_code`, `elapsed`, `attempts`, `request`) are intended for test harnesses, logging, or UI telemetry.
+- Per-result `favicon` and `og_image` are optional and may be null when the page doesn't declare them or the fetch/parsing failed.
+- When `fetched` is false for a result you can check `error` for a short message; wrapper metadata still helps diagnose network timeouts or retry behavior.
 
 ## Edge cases, limitations & behavior
 
