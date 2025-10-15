@@ -476,6 +476,107 @@ uvicorn api:app --reload
 python3 scripts/test_api.py
 ```
 
+## Deployment to Vercel
+
+This project includes configuration for easy deployment to Vercel as a serverless FastAPI application.
+
+### Prerequisites
+
+1. A [Vercel account](https://vercel.com)
+2. Vercel CLI installed: `npm i -g vercel`
+3. Your project pushed to a Git repository (GitHub, GitLab, or Bitbucket)
+
+### Quick Deployment
+
+1. **Test locally first:**
+
+   ```bash
+   source .venv/bin/activate
+   ./deploy.sh
+   ```
+
+   This will start a local development server at `http://localhost:8000`
+
+2. **Deploy to Vercel:**
+
+   ```bash
+   # Login to Vercel (one time setup)
+   vercel login
+
+   # Deploy from your project directory
+   vercel
+
+   # For production deployment
+   vercel --prod
+   ```
+
+### Deployment Files
+
+The following files configure Vercel deployment:
+
+- `vercel.json`: Main Vercel configuration
+- `runtime.txt`: Specifies Python version (3.11)
+- `.vercelignore`: Files to exclude from deployment
+- `requirements.txt`: Python dependencies
+
+### API Endpoints
+
+Once deployed, your API will have these endpoints:
+
+- `GET /health`: Health check endpoint
+- `POST /process`: Main API endpoint for processing requests
+- `GET /docs`: FastAPI auto-generated documentation
+- `GET /redoc`: Alternative API documentation
+
+### Example Usage
+
+After deployment, you can use your API like this:
+
+```bash
+# Health check
+curl https://your-app.vercel.app/health
+
+# Search request
+curl -X POST https://your-app.vercel.app/process \
+  -H "Content-Type: application/json" \
+  -d '{"mode":"search","query":"Next.js routing","limit":3}'
+
+# Docs request
+curl -X POST https://your-app.vercel.app/process \
+  -H "Content-Type: application/json" \
+  -d '{"mode":"docs","url":"https://nextjs.org/docs","limit":2}'
+```
+
+### Environment Variables
+
+If your application needs environment variables, you can set them in the Vercel dashboard or via CLI:
+
+```bash
+vercel env add VARIABLE_NAME
+```
+
+### Troubleshooting Deployment
+
+- **Import errors**: Make sure all dependencies are in `requirements.txt`
+- **Timeout issues**: Vercel has a 10-second timeout for serverless functions
+- **Memory issues**: Consider reducing content limits for large documents
+- **Module not found**: Ensure proper Python path structure
+
+### Local Testing
+
+Before deploying, always test locally:
+
+```bash
+# Start local development server
+./deploy.sh
+
+# Test endpoints
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/process \
+  -H "Content-Type: application/json" \
+  -d '{"mode":"search","query":"test","limit":1}'
+```
+
 ### Project Structure
 
 ```
