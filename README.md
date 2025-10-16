@@ -1,7 +1,7 @@
 # unifero-cli
 
 <p align="center">
-  <img src="./assets/logo.svg" alt="unifero logo" width="220" />
+  <img src="./public/unifero.png" alt="unifero logo" width="220" />
 </p>
 
 Unifero-CLI is a compact Python toolkit that brings web-search and documentation crawling into a single, easy to use tool. It focuses on safely extracting technical content and code snippets from result pages or documentation sites. The project provides:
